@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Search for <%= query %></title>
+  </head>
+  <body>
+    <p><%= count %></p>
+    <% for (var i=0; i < bibs.length; i++) { 
+      var bib = bibs[i] %>
+    <h3><%= bib.title %></h3>
+    <ul>
+      <% for (var j=0; j < bib.items.length; j++) {
+        var item = bib.items[j] %>
+      <li><%= item %></li>
+      <% } %>
+    </ul>
+    <% } %>
+  </body>
+</html>
