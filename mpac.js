@@ -30,7 +30,7 @@ var server = http.createServer(function (request, response) {
       //response.write('HEADERS: ' + JSON.stringify(search_response.headers) + '\n\n');
       var handler = new htmlparser.DefaultHandler(function (error, dom) {
         if (error) response.end(error);
-        fs.readFile('results.html', function (error, data) {
+        fs.readFile('search.html', function (error, data) {
           if (error) response.end(error);
           var context = {locals: {
             query: query,
