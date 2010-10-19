@@ -2,10 +2,16 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Search for <%= query %></title>
+    <title>Search<% if (query) { %> for <%= query %><% } %></title>
   </head>
   <body>
-    <p><%= count %></p>
+    <form>
+      <div>
+        <input name="q" type="text"<% if (query) { %> value="<%= query %>"<% } %> />
+        <input type="submit" />
+      </div>
+    </form>
+    <% if (count) { %><p><%= count %></p><% } %>
     <% for (var i=0; i < bibs.length; i++) { 
       var bib = bibs[i] %>
     <h3><%= bib.title %></h3>

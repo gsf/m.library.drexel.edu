@@ -1,7 +1,7 @@
 var fs = require('fs');
 var htmlparser = require('htmlparser');
 var http = require('http');
-//var querystring = require('querystring');
+var querystring = require('querystring');
 var select = require('soupselect').select;
 var sys = require('sys');
 var url = require('url');
@@ -11,12 +11,11 @@ var innoserv = http.createClient(80, 'innoserv.library.drexel.edu');
 
 var server = http.createServer(function (request, response) {
   console.log('Request from ' + request.url);
-  var url_parts = url.parse(request.url);
+  var url_parts = url.parse(request.url, true);
   if (url_parts.pathname ==='/') {
-    // url_parts.query should be the search terms
-    var query = url_parts.query || '';
+    var query = url_parts.query.q || '';
     console.log('Query: ' + query);
-    var search_path = '/search~S9?/X(' + query + ')';
+    var search_path = '/search~S9?/X(' + querystring.escape(query) + ')';
     console.log(search_path);
     var search_request = innoserv.request(
       'GET', search_path,
@@ -38,7 +37,7 @@ var server = http.createServer(function (request, response) {
             bibs: []
           }};
           var count = select(dom, 'div.browseSearchtoolMessage i')[0];
-          console.log('Count: ' + count);
+          //console.log('Count: ' + count);
           if (count) {
             context.locals.count = count.children[0].data;
             var titles = select(dom, 'span.briefcitTitle a');
@@ -53,7 +52,7 @@ var server = http.createServer(function (request, response) {
               //response.write(titles[i].children[0].data + '\n');
             }
           }
-          console.log('Context: ' + sys.inspect(context));
+          //console.log('Context: ' + sys.inspect(context));
           response.end(ejs.render(data.toString('utf8'), context));
         });
       }
