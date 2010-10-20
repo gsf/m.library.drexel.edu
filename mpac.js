@@ -13,11 +13,11 @@ var server = http.createServer(function (request, response) {
   console.log('Request from ' + request.url);
   var urlParts = url.parse(request.url, true);
   if (urlParts.pathname ==='/') {
-    var query = urlParts.query.q || '';
+    var query = (urlParts.query) ? urlParts.query.q : '';
     var queryEscaped = querystring.escape(query);
-    console.log('Query: ' + query);
+    //console.log('Query: ' + query);
     // range is grabbed from innopac, looks like "51,1036,1036"
-    var range = urlParts.query.r || '';
+    var range = (urlParts.query) ? urlParts.query.r : '';
     var rangeEscaped = querystring.escape(range);
     var start = 1;
     var searchPath = '/search~S9?/X(' + queryEscaped + ')';
@@ -45,7 +45,7 @@ var server = http.createServer(function (request, response) {
           var locals = {
             query: query,
             queryEscaped: queryEscaped,
-            count: 'No records found.',
+            count: '',
             prev: '',
             next: '',
             start: start,
@@ -54,6 +54,9 @@ var server = http.createServer(function (request, response) {
             titles: {}
           };
           var count = select(dom, 'td.browseHeaderData')[0];
+          if (query && !count) {
+            locals.count = 'No records found.';
+          }
           //console.log('Count: ' + count);
           if (count) {
             locals.count = count.children[0].data.match(/\((.+)\)/)[1];
