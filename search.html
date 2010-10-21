@@ -13,14 +13,11 @@
     </form>
     <% if (count) { %>
     <p><% if (prev) { %><a href="?q=<%= queryEscaped %>&r=<%= prev %>">Prev</a><% } %> <%= count %> <% if (next) { %><a href="?q=<%= queryEscaped %>&r=<%= next %>">Next</a><% } %></p>
-    <% } else { %>
-    <p>Please search the catalog.</p>
-    <% } %>
     <ol start="<%= start %>">
       <% for (i in bibs) { 
         var bib = bibs[i]; %>
       <li>
-        <h4><%= bib.title %></h3>
+        <div><%= bib.title %></div>
         <ul>
           <% for (i in bib.items) { 
             var item = bib.items[i]; %>
@@ -30,5 +27,10 @@
       </li>
       <% } %>
     </ol>
+    <p><a href="<%- full %>">See these results in the full catalog</a></p>
+    <% } else { %>
+    <p>Please search.</p>
+    <p><a href="<%- full %>">Full catalog</a></p>
+    <% } %>
   </body>
 </html>

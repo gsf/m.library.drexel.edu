@@ -13,35 +13,43 @@ var server = http.createServer(function (request, response) {
   console.log('Request from ' + request.url);
   var urlParts = url.parse(request.url, true);
   if (urlParts.pathname ==='/') {
-    var query = (urlParts.query) ? urlParts.query.q : '';
-    var queryEscaped = querystring.escape(query);
-    //console.log('Query: ' + query);
-    // range is grabbed from innopac, looks like "51,1036,1036"
-    var range = (urlParts.query) ? urlParts.query.r : '';
-    var rangeEscaped = querystring.escape(range);
-    var start = 1;
-    var searchPath = '/search~S9?/X(' + queryEscaped + ')';
-    if (range) {
-      // start is the digits in range up to the first comma
-      start = range.match(/\d+(?=,)/)[0];
-      console.log(start);
-      searchPath = '/search~S9?/X(' + queryEscaped + ')&/X(' + queryEscaped + ')&/' + rangeEscaped + '/browse';
-    } 
-    console.log(searchPath);
-    var searchRequest = innoserv.request(
-      'GET', searchPath,
-      { 'host': 'innoserv.library.drexel.edu' 
-      , 'connection': 'keep-alive'
-    });
-    searchRequest.end();
     response.writeHead(200, {'Content-Type': 'text/html'});
-    searchRequest.on('response', function (searchResponse) {
-      //response.write('STATUS: ' + searchResponse.statusCode + '\n');
-      //response.write('HEADERS: ' + JSON.stringify(searchResponse.headers) + '\n\n');
-      var handler = new htmlparser.DefaultHandler(function (error, dom) {
-        if (error) response.end(error);
-        fs.readFile('search.html', function (error, data) {
-          if (error) response.end(error);
+    fs.readFile('search.html', function (error, data) {
+      if (error) throw error;
+      var query = (urlParts.query) ? urlParts.query.q : '';
+      var searchPath = '/search~S9?/X'
+      if (!query) {
+        var locals = {
+          query: '',
+          count: '',
+          full: 'http://innoserv.library.drexel.edu' + searchPath
+        };
+        response.end(ejs.render(data.toString('utf8'), {locals: locals}));
+        return;
+      }
+      var queryEscaped = querystring.escape(query);
+      var searchPath = searchPath + '(' + queryEscaped + ')';
+      //console.log('Query: ' + query);
+      // range is grabbed from innopac, looks like "51,1036,1036"
+      var range = (urlParts.query) ? urlParts.query.r : '';
+      var start = 1;
+      if (range) {
+        // start is the digits in range up to the first comma
+        start = range.match(/\d+(?=,)/)[0];
+        console.log(start);
+        searchPath = searchPath + '&/X(' + queryEscaped + ')&/' + querystring.escape(range) + '/browse';
+      } 
+      var searchRequest = innoserv.request(
+        'GET', searchPath,
+        { 'host': 'innoserv.library.drexel.edu' 
+        , 'connection': 'keep-alive'
+      });
+      searchRequest.end();
+      searchRequest.on('response', function (searchResponse) {
+        //response.write('STATUS: ' + searchResponse.statusCode + '\n');
+        //response.write('HEADERS: ' + JSON.stringify(searchResponse.headers) + '\n\n');
+        var handler = new htmlparser.DefaultHandler(function (error, dom) {
+          if (error) throw error;
           var locals = {
             query: query,
             queryEscaped: queryEscaped,
@@ -49,7 +57,8 @@ var server = http.createServer(function (request, response) {
             prev: '',
             next: '',
             start: start,
-            bibs: []
+            bibs: [],
+            full: 'http://innoserv.library.drexel.edu' + searchPath
           };
           var count = select(dom, 'td.browseHeaderData')[0];
           if (query && !count) {
@@ -94,16 +103,16 @@ var server = http.createServer(function (request, response) {
           }
           //console.log('Context: ' + sys.inspect(locals));
           response.end(ejs.render(data.toString('utf8'), {locals: locals}));
+        }
+        , {verbose: false, ignoreWhitespace: true}
+        );
+        var parser = new htmlparser.Parser(handler);
+        searchResponse.on('data', function (chunk) {
+          parser.parseChunk(chunk);
         });
-      }
-      , {verbose: false, ignoreWhitespace: true}
-      );
-      var parser = new htmlparser.Parser(handler);
-      searchResponse.on('data', function (chunk) {
-        parser.parseChunk(chunk);
-      });
-      searchResponse.on('end', function () {
-        parser.done();
+        searchResponse.on('end', function () {
+          parser.done();
+        });
       });
     });
   } else {
