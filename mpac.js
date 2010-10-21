@@ -49,9 +49,7 @@ var server = http.createServer(function (request, response) {
             prev: '',
             next: '',
             start: start,
-            // TODO titles needs to be a list in case two
-            // titles are the same -- for (x in list) { list[x] }
-            titles: {}
+            bibs: []
           };
           var count = select(dom, 'td.browseHeaderData')[0];
           if (query && !count) {
@@ -75,7 +73,10 @@ var server = http.createServer(function (request, response) {
             for (var i=0; i < titles.length; i++) {
               var title = titles[i].children[0].data;
               var items = []; // TODO: grab actions or items
-              locals.titles[title] = items;
+              locals.bibs.push({
+                title: title,
+                items: items
+              });
             }
           }
           //console.log('Context: ' + sys.inspect(locals));

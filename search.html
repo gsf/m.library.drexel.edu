@@ -17,12 +17,13 @@
     <p>Please search the catalog.</p>
     <% } %>
     <ol start="<%= start %>">
-      <% for (title in titles) { 
-        var items = titles[title]; %>
+      <% for (i in bibs) { 
+        var bib = bibs[i]; %>
       <li>
-        <h4><%= title %></h3>
+        <h4><%= bib.title %></h3>
         <ul>
-          <% for (item in items) { %>
+          <% for (i in bib.items) { 
+            var item = bib.items[i]; %>
           <li><%= item %></li>
           <% } %>
         </ul>
