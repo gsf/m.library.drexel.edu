@@ -27,6 +27,7 @@
       </li>
       <% } %>
     </ol>
+    <p><% if (prev) { %><a href="?q=<%= queryEscaped %>&r=<%= prev %>">Prev</a><% } %> <%= count %> <% if (next) { %><a href="?q=<%= queryEscaped %>&r=<%= next %>">Next</a><% } %></p>
     <p><a href="<%- full %>">See these results in the full catalog</a></p>
     <% } else { %>
     <p>Please search.</p>
