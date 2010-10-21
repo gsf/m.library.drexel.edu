@@ -8,11 +8,13 @@
     <form>
       <div>
         <input name="q" type="text"<% if (query) { %> value="<%= query %>"<% } %> />
-        <input type="submit" />
+        <input type="submit" value="Search" />
       </div>
     </form>
     <% if (count) { %>
     <p><% if (prev) { %><a href="?q=<%= queryEscaped %>&r=<%= prev %>">Prev</a><% } %> <%= count %> <% if (next) { %><a href="?q=<%= queryEscaped %>&r=<%= next %>">Next</a><% } %></p>
+    <% } else { %>
+    <p>Please search the catalog.</p>
     <% } %>
     <ol start="<%= start %>">
       <% for (title in titles) { 
