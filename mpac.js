@@ -69,12 +69,25 @@ var server = http.createServer(function (request, response) {
             });
             var titles = select(dom, 'span.briefcitTitle a');
             var actions = select(dom, 'div.briefcitActions');
-            var items = select(dom, 'div.briefcitItems');
+            var citItems = select(dom, 'div.briefcitItems');
             for (var i=0; i < titles.length; i++) {
-              var title = titles[i].children[0].data;
-              var items = []; // TODO: grab actions or items
+              var items = [];
+              var action = actions[i];
+              if (action) {
+                if (action.children[0].name === 'a') { 
+                  items.push('<a href="' + action.children[0].attribs.href + '">Online resource</a>');
+                } else {
+                  var entries = select(citItems[i], 'tr.bibItemsEntry');
+                  for (var j=0; j < entries.length; j++) {
+                    var entry = entries[j];
+                    items.push(entry.children[0].children[1].data + ' ' + entry.children[1].children[2].children[0].data + ' ' + entry.children[2].children[1].data);
+                  }
+                }
+              } else { // handle crazy customized resource
+                items.push('<a href="' + titles[i].attribs.href + '">Online resource</a>');
+              }
               locals.bibs.push({
-                title: title,
+                title: titles[i].children[0].data,
                 items: items
               });
             }
