@@ -89,7 +89,14 @@ var server = http.createServer(function (request, response) {
                   var entries = select(citItems[i], 'tr.bibItemsEntry');
                   for (var j=0; j < entries.length; j++) {
                     var entry = entries[j];
-                    items.push(entry.children[0].children[1].data + ' ' + entry.children[1].children[2].children[0].data + ' ' + entry.children[2].children[1].data);
+                    var loc = entry.children[0].children[1].data;
+                    try {
+                      var call_no = entry.children[1].children[2].children[0].data;
+                    } catch (e) {
+                      var call_no = '';
+                    }
+                    var stat = entry.children[2].children[1].data;
+                    items.push(loc + ' ' + call_no + ' ' + stat);
                   }
                 }
               } else { // handle crazy customized resource
