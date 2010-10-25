@@ -95,6 +95,9 @@ var server = http.createServer(function (request, response) {
               } else { // handle crazy customized resource
                 items.push('<a href="' + titles[i].attribs.href + '">Online resource</a>');
               }
+              if (!items.length) {
+                items.push('On order.');
+              }
               locals.bibs.push({
                 title: titles[i].children[0].data,
                 items: items
